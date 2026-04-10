@@ -26,6 +26,10 @@ public class BcryptUtils {
      * @return 如果匹配返回 true，否则返回 false
      */
     public static boolean verifyPasswd(String plainPassword, String hashedPassword) {
+        // 检查参数是否为null
+        if (plainPassword == null || hashedPassword == null) {
+            return false;
+        }
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }
 }
