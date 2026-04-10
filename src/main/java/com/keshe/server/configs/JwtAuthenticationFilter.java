@@ -1,8 +1,9 @@
 package com.keshe.server.configs;
 
-import com.keshe.server.service.JwtService;
-import com.keshe.server.service.UserDetailsServiceImpl;
+import com.keshe.server.service.UserDetailsImpl;
+import com.keshe.server.service.UserDetailsService;
 import com.keshe.server.utils.DateTimeTool;
+import com.keshe.server.utils.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,18 +28,15 @@ import java.util.Date;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
-    private final JwtService jwtService;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
     private RequestAttributeSecurityContextRepository repo;
 
     public JwtAuthenticationFilter(
-            JwtService jwtService,
-            UserDetailsServiceImpl userDetailsService,
+            UserDetailsService userDetailsService,
             HandlerExceptionResolver handlerExceptionResolver
     ) {
-        this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
@@ -49,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String username = "";
+        String userId = "";
         String url = request.getRequestURI();
         Date startDate = new Date();
         final String authHeader = request.getHeader("Authorization");
@@ -62,15 +60,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String jwt = authHeader.substring(7);
-            username = jwtService.extractUsername(jwt);
+            // 提取令牌，处理可能的额外字符
+            String jwt = authHeader.substring(7).trim();
+            // 移除可能的引号
+            if (jwt.startsWith("\"")) {
+                jwt = jwt.substring(1);
+            }
+            if (jwt.endsWith("\"")) {
+                jwt = jwt.substring(0, jwt.length() - 1);
+            }
+            
+            // 使用JWTUtil获取用户ID
+            userId = JWTUtil.getTokenInfo(jwt, JWTUtil.SECRET_KEY).get("user_id", String.class);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (username != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (userId != null && authentication == null) {
+                // 根据用户ID获取用户详情
+                UserDetails userDetails = null;
+                try {
+                    userDetails = this.userDetailsService.loadUserById(Long.parseLong(userId));
+                } catch (Exception e) {
+                    // 处理异常
+                }
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (userDetails != null) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -79,6 +93,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    // 设置用户 ID 到请求属性中
+                    request.setAttribute("userId", Long.parseLong(userId));
                 }
             }
             SecurityContext context = SecurityContextHolder.getContext();
@@ -87,7 +103,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Date endDate = new Date();
             double requestTime = (int) (endDate.getTime() - startDate.getTime())/1000.;
             String startTime = DateTimeTool.parseDateTime(startDate);
-            logger.info(url + "," +username+"," + startTime+ "," + requestTime);
+            logger.info(url + "," +userId+"," + startTime+ "," + requestTime);
         } catch (Exception exception) {
             exception.printStackTrace();
             handlerExceptionResolver.resolveException(request, response, null, exception);

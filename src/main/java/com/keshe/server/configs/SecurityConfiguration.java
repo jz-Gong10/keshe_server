@@ -44,8 +44,9 @@ public class SecurityConfiguration {
                         authz -> {
                             try {
                                 authz
-                                        .requestMatchers("/api/**")
-                                        .authenticated()
+                                        .requestMatchers("/auth/**").permitAll()
+                                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                                        .requestMatchers("/user/**").authenticated()
                                         .anyRequest().permitAll();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);

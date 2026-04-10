@@ -1,6 +1,6 @@
 package com.keshe.server.configs;
 
-import com.keshe.server.service.UserDetailsServiceImpl;
+import com.keshe.server.service.UserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,9 +12,9 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 
 @Configuration
 public class ApplicationConfiguration {
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    public ApplicationConfiguration(UserDetailsServiceImpl userDetailsService) {
+    public ApplicationConfiguration(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

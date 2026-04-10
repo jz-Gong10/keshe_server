@@ -24,7 +24,7 @@ public class LoginService {
 
     @Resource
     private JWTUtil jwtUtil;
-
+    
     /**
      * 获取token
      *
@@ -71,8 +71,8 @@ public class LoginService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(BcryptUtils.encrypt(password));
-        userRepository.save(user);
-        return Result.success(getToken(user), "注册成功");
+        User savedUser = userRepository.save(user);
+        return Result.success(getToken(savedUser), "注册成功");
     }
 
     @Transactional
