@@ -15,6 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 security:
   jwt:
@@ -22,3 +23,7 @@ security:
     refresh-secret-key: SGVsbG8gV29ybGQga2VzaGUtc2VydmVyIHJlZnJlc2gtc2VjcmV0LWtleQ==
     expiration-time: 1800000
     refresh-expiration-time: 7200000
+
+server:
+  address: 0.0.0.0
+  port: 8080
