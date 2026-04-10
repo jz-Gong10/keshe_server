@@ -33,8 +33,8 @@ public class JWTUtil {
     public static final int REFRESH_EXPIRE_TIME = 2 * 60 * 60;//RefreshToken过期时间（秒）
     
     // 为了兼容LoginService中的静态调用，添加静态变量
-    public static String SECRET_KEY;
-    public static String REFRESH_SECRET_KEY;
+    public static String SECRET_KEY = "SGVsbG8gV29ybGQga2VzaGUtc2VydmVyIGp3dC1zZWNyZXQta2V5";
+    public static String REFRESH_SECRET_KEY = "SGVsbG8gV29ybGQga2VzaGUtc2VydmVyIHJlZnJlc2gtc2VjcmV0LWtleQ==";
     
     // 初始化静态变量
     @PostConstruct

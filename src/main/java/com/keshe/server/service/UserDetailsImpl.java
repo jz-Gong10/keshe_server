@@ -18,7 +18,7 @@ import java.util.Objects;
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
 
     private String username;
 
@@ -27,7 +27,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Integer id, String username, String password,
+    public UserDetailsImpl(Long id, String username, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
@@ -37,7 +37,10 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // 为简单实现，添加一个默认权限
+        // 根据用户的实际角色添加权限
+        if (user.getRole() != null && user.getRole().equals("ADMIN")) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new UserDetailsImpl(
