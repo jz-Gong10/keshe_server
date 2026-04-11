@@ -15,12 +15,12 @@ public class UserController {
     @Resource
     private UpdateProfileService updateProfileService;
 
-    @GetMapping("/profile")
+    @GetMapping("/getProfile")
     public ResponseEntity<Result> getProfile(@RequestAttribute("userId") Long userId) {
         return updateProfileService.getProfile(userId);
     }
 
-    @PostMapping("/profile")
+    @PostMapping("/updateProfile")
     public ResponseEntity<Result> updateProfile(@RequestAttribute("userId") Long userId, @ModelAttribute UpdateProfileDTO updateProfileDTO) {
         return updateProfileService.updateProfile(userId, updateProfileDTO);
     }
