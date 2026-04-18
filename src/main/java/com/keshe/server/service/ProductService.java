@@ -1,5 +1,6 @@
 package com.keshe.server.service;
 
+import com.keshe.server.data.po.Comment;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.repository.ProductRepository;
 import jakarta.annotation.Resource;
@@ -13,19 +14,51 @@ public class ProductService {
     @Resource
     private ProductRepository productRepository;
 
-//获取所有商品列表
+    //获取所有商品列表
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-//根据商品ID获取商品
+    //根据商品ID获取商品
     public Product getProductById(int productId) {
         return productRepository.findByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("商品不存在"));
     }
 
-//根据分类获取商品
+    //根据分类获取商品
     public List<Product> getProductsByCategory(String category) {
         return productRepository.findByProductCategory(category);
     }
+
+    //购买商品
+    public Product buyProduct(int productId, Long buyerId) {
+        Product product = productRepository.findByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("商品不存在"));
+        
+        // 将buyerStatus从0改为1
+        product.setBuyerStatus(1);
+        // 设置购买者ID
+        product.setBuyerId(buyerId.longValue());
+        
+        // 保存更新
+        return productRepository.save(product);
+    }
+
+    //卖家接单
+    public Product acceptOrder(int productId, Long sellerId) {
+        Product product = productRepository.findByProductId(productId)
+                .orElseThrow(() -> new RuntimeException("商品不存在"));
+        
+        // 验证是否是商品的卖家
+        if (!sellerId.equals(product.getSellerId())) {
+            throw new RuntimeException("只有商品卖家才能接单");
+        }
+        
+        // 将seller_status从0改为1
+        product.setSellerStatus(1);
+        
+        // 保存更新
+        return productRepository.save(product);
+    }
+
 }

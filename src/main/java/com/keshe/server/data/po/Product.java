@@ -19,12 +19,18 @@ import java.util.List;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int productId;
+    private Integer productId;
     private String productName;
     private String productDescription;
     private double productPrice;
     @ElementCollection
     private List<String> productUrl;
     private String productCategory;
-    private int productState;
+    
+    private Long sellerId;
+    private Long buyerId;
+
+    private int buyerStatus;
+    private int sellerStatus;
+
 }

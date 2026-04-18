@@ -1,5 +1,8 @@
 package com.keshe.server.controller;
 
+import com.keshe.server.data.dto.AcceptOrderDTO;
+import com.keshe.server.data.dto.BuyProductDTO;
+import com.keshe.server.data.po.Comment;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.data.vo.Result;
 import com.keshe.server.service.ProductService;
@@ -36,4 +39,20 @@ public class ProductController {
         List<Product> products = productService.getProductsByCategory(category);
         return Result.success(products, "获取分类商品列表成功");
     }
+
+    //购买商品
+    @PostMapping("/buy")
+    public ResponseEntity<Result> buyProduct(@RequestBody BuyProductDTO dto, @RequestAttribute("userId") Long userId) {
+        Product product = productService.buyProduct(dto.getProductId(), userId);
+        return Result.success(product, "购买成功");
+    }
+
+    //卖家接单
+    @PostMapping("/accept")
+    public ResponseEntity<Result> acceptOrder(@RequestBody AcceptOrderDTO dto, @RequestAttribute("userId") Long userId) {
+        Product product = productService.acceptOrder(dto.getProductId(), userId);
+        return Result.success(product, "接单成功");
+    }
+
+
 }
