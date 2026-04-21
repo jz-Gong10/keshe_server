@@ -2,6 +2,7 @@ package com.keshe.server.controller;
 
 import com.keshe.server.data.dto.AcceptOrderDTO;
 import com.keshe.server.data.dto.BuyProductDTO;
+import com.keshe.server.data.dto.SellProductDTO;
 import com.keshe.server.data.po.Comment;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.data.vo.Result;
@@ -54,5 +55,12 @@ public class ProductController {
         return Result.success(product, "接单成功");
     }
 
+    //发布商品
+    @PostMapping("/sell")
+    public ResponseEntity<Result> sellProduct(@RequestBody SellProductDTO dto, @RequestAttribute("userId") Long userId) {
+        Product product = productService.sellProduct(dto.getProductName(), dto.getProductDescription(), dto.getProductPrice(), dto.getProductUrl(), dto.getProductCategory(), userId);
+        return Result.success(product, "发布商品成功");
+    }
 
 }
+

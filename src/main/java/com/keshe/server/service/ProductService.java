@@ -38,7 +38,7 @@ public class ProductService {
         // 将buyerStatus从0改为1
         product.setBuyerStatus(1);
         // 设置购买者ID
-        product.setBuyerId(buyerId.longValue());
+        product.setBuyerId(buyerId);
         
         // 保存更新
         return productRepository.save(product);
@@ -48,16 +48,33 @@ public class ProductService {
     public Product acceptOrder(int productId, Long sellerId) {
         Product product = productRepository.findByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("商品不存在"));
-        
+
         // 验证是否是商品的卖家
         if (!sellerId.equals(product.getSellerId())) {
             throw new RuntimeException("只有商品卖家才能接单");
         }
-        
-        // 将seller_status从0改为1
+
+        // 将sellerStatus从0改为1
         product.setSellerStatus(1);
-        
+
         // 保存更新
+        return productRepository.save(product);
+    }
+
+    //发布商品
+    public Product sellProduct(String productName, String productDescription, double productPrice, List<String> productUrl, String productCategory, Long sellerId) {
+        Product product = new Product();
+        product.setProductName(productName);
+        product.setProductDescription(productDescription);
+        product.setProductPrice(productPrice);
+        product.setProductUrl(productUrl);
+        product.setProductCategory(productCategory);
+        product.setSellerId(sellerId);
+        product.setBuyerId(null);
+        product.setBuyerStatus(0);
+        product.setSellerStatus(0);
+        
+        // 保存商品
         return productRepository.save(product);
     }
 
