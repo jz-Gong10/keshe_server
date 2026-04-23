@@ -1,6 +1,5 @@
 package com.keshe.server.service;
 
-import com.keshe.server.data.po.Comment;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.repository.ProductRepository;
 import jakarta.annotation.Resource;
@@ -34,12 +33,12 @@ public class ProductService {
     public Product buyProduct(int productId, Long buyerId) {
         Product product = productRepository.findByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("商品不存在"));
-        
+
         // 将buyerStatus从0改为1
         product.setBuyerStatus(1);
         // 设置购买者ID
         product.setBuyerId(buyerId);
-        
+
         // 保存更新
         return productRepository.save(product);
     }
@@ -73,7 +72,7 @@ public class ProductService {
         product.setBuyerId(null);
         product.setBuyerStatus(0);
         product.setSellerStatus(0);
-        
+
         // 保存商品
         return productRepository.save(product);
     }

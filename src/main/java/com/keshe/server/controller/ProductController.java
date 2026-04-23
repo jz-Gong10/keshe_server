@@ -3,14 +3,16 @@ package com.keshe.server.controller;
 import com.keshe.server.data.dto.AcceptOrderDTO;
 import com.keshe.server.data.dto.BuyProductDTO;
 import com.keshe.server.data.dto.SellProductDTO;
-import com.keshe.server.data.po.Comment;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.data.vo.Result;
 import com.keshe.server.service.ProductService;
+import com.keshe.server.utils.FileUploadUtils;
 import jakarta.annotation.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin
@@ -60,6 +62,22 @@ public class ProductController {
     public ResponseEntity<Result> sellProduct(@RequestBody SellProductDTO dto, @RequestAttribute("userId") Long userId) {
         Product product = productService.sellProduct(dto.getProductName(), dto.getProductDescription(), dto.getProductPrice(), dto.getProductUrl(), dto.getProductCategory(), userId);
         return Result.success(product, "发布商品成功");
+    }
+
+    //上传图片（支持单张或多张）
+    @PostMapping("/upload")
+    public ResponseEntity<Result> uploadImage(@RequestParam("files") List<MultipartFile> files) {
+        try {
+            List<String> urls = FileUploadUtils.uploadFiles(files);
+            // 如果只上传了一张，返回单个URL，否则返回URL列表
+            if (urls.size() == 1) {
+                return Result.success(urls.getFirst(), "上传成功");
+            } else {
+                return Result.success(urls, "上传成功");
+            }
+        } catch (IOException e) {
+            return Result.error(500, "上传失败: " + e.getMessage());
+        }
     }
 
 }
