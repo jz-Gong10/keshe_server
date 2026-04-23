@@ -24,7 +24,7 @@ spring:
 
   web:
     resources:
-      static-locations: file:D:/JavaFile/project/server/uploads/
+      static-locations: file:${user.dir}/uploads/
 
 security:
   jwt:
@@ -39,5 +39,5 @@ server:
 
 file:
   upload:
-    dir: D:/JavaFile/project/server/uploads
+    dir: ${user.dir}/uploads
   base-url: http://localhost:8080

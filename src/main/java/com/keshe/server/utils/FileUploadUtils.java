@@ -20,7 +20,7 @@ public class FileUploadUtils {
 
     private static String baseUrl;
 
-    @Value("${file.upload.dir:D:/JavaFile/project/server/uploads}")
+    @Value("${file.upload.dir:${user.dir}/uploads}")
     public void setUploadDir(String uploadDir) {
         FileUploadUtils.uploadDir = uploadDir;
     }
