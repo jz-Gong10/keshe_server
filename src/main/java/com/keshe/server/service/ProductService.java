@@ -1,8 +1,10 @@
 package com.keshe.server.service;
 
 import com.keshe.server.data.po.Product;
+import com.keshe.server.data.vo.Result;
 import com.keshe.server.repository.ProductRepository;
 import jakarta.annotation.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,6 +77,29 @@ public class ProductService {
 
         // 保存商品
         return productRepository.save(product);
+    }
+
+    //获取用户购买的商品
+    public List<Product> getMyPurchases(Long buyerId) {
+        return productRepository.findByBuyerId(buyerId);
+    }
+
+    //删除商品（只能删除自己的商品）
+    public ResponseEntity<Result> deleteProduct(Integer productId, Long sellerId) {
+        // 查找商品
+        Product product = productRepository.findByProductId(productId).orElse(null);
+        if (product == null) {
+            return Result.error(404, "商品不存在");
+        }
+
+        // 验证是否是自己的商品
+        if (!sellerId.equals(product.getSellerId())) {
+            return Result.error(403, "只能删除自己的商品");
+        }
+
+        // 删除商品
+        productRepository.delete(product);
+        return Result.success(null, "删除商品成功");
     }
 
 }

@@ -1,6 +1,7 @@
 package com.keshe.server.controller;
 
 import com.keshe.server.data.dto.AddCommentDTO;
+import com.keshe.server.data.dto.DeleteCommentDTO;
 import com.keshe.server.data.vo.Result;
 import com.keshe.server.service.CommentService;
 import jakarta.annotation.Resource;
@@ -33,4 +34,11 @@ public class CommentController {
     public ResponseEntity<Result> addComment(@RequestBody AddCommentDTO dto, @RequestAttribute("userId") Long userId) {
         return commentService.addComment(dto.getProductId(), dto.getContent(), userId);
     }
+
+    // 删除评论（只能删除自己的评论）
+    @PostMapping("/delete")
+    public ResponseEntity<Result> deleteComment(@RequestAttribute("userId") Long userId, @RequestBody DeleteCommentDTO dto) {
+        return commentService.deleteComment(dto.getId(), userId);
+    }
+
 }

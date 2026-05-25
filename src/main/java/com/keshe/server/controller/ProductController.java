@@ -2,6 +2,7 @@ package com.keshe.server.controller;
 
 import com.keshe.server.data.dto.AcceptOrderDTO;
 import com.keshe.server.data.dto.BuyProductDTO;
+import com.keshe.server.data.dto.DeleteProductDTO;
 import com.keshe.server.data.dto.SellProductDTO;
 import com.keshe.server.data.po.Product;
 import com.keshe.server.data.vo.Result;
@@ -64,6 +65,13 @@ public class ProductController {
         return Result.success(product, "发布商品成功");
     }
 
+    //获取用户购买的商品
+    @GetMapping("/my-purchases")
+    public ResponseEntity<Result> getMyPurchases(@RequestAttribute("userId") Long userId) {
+        List<Product> products = productService.getMyPurchases(userId);
+        return Result.success(products, "获取购买商品列表成功");
+    }
+
     //上传图片（支持单张或多张）
     @PostMapping("/upload")
     public ResponseEntity<Result> uploadImage(@RequestParam("files") List<MultipartFile> files) {
@@ -78,6 +86,12 @@ public class ProductController {
         } catch (IOException e) {
             return Result.error(500, "上传失败: " + e.getMessage());
         }
+    }
+
+    //删除商品（只能删除自己的商品）
+    @PostMapping("/delete")
+    public ResponseEntity<Result> deleteProduct(@RequestAttribute("userId") Long userId, @RequestBody DeleteProductDTO dto) {
+        return productService.deleteProduct(dto.getProductId(), userId);
     }
 
 }
