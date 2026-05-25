@@ -37,8 +37,8 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // 根据用户的实际角色添加权限
-        if (user.getRole() != null && user.getRole().equals("ADMIN")) {
+        // 根据用户的实际角色添加权限（role = "ADMIN" 是管理员）
+        if (user.getRole() != null && "ADMIN".equals(user.getRole())) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));

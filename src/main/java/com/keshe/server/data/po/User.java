@@ -16,7 +16,7 @@ public class User {
 
     private String phone;
     private String email;
-    private String role; // USER / ADMIN
+    private String role; // 0:普通用户 1:管理员
 
     private String nickname;
     private String avatar;//头像
