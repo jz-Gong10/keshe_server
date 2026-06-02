@@ -12,4 +12,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Optional<Product> findByProductId(Integer productId);
     List<Product> findByProductCategory(String productCategory);
     List<Product> findByBuyerId(Long buyerId);
+    List<Product> findBySellerId(Long sellerId);
+    
+    // 获取 buyerStatus 和 sellerStatus 都为 0 的商品
+    List<Product> findByBuyerStatusAndSellerStatus(int buyerStatus, int sellerStatus);
+    
+    // 根据分类获取 buyerStatus 和 sellerStatus 都为 0 的商品
+    List<Product> findByProductCategoryAndBuyerStatusAndSellerStatus(String productCategory, int buyerStatus, int sellerStatus);
 }

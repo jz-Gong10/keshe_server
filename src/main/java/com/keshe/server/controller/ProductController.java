@@ -47,8 +47,7 @@ public class ProductController {
     //购买商品
     @PostMapping("/buy")
     public ResponseEntity<Result> buyProduct(@RequestBody BuyProductDTO dto, @RequestAttribute("userId") Long userId) {
-        Product product = productService.buyProduct(dto.getProductId(), userId);
-        return Result.success(product, "购买成功");
+        return productService.buyProduct(dto.getProductId(), userId);
     }
 
     //卖家接单
@@ -70,6 +69,13 @@ public class ProductController {
     public ResponseEntity<Result> getMyPurchases(@RequestAttribute("userId") Long userId) {
         List<Product> products = productService.getMyPurchases(userId);
         return Result.success(products, "获取购买商品列表成功");
+    }
+
+    //获取用户发布的商品
+    @GetMapping("/my-products")
+    public ResponseEntity<Result> getMyProducts(@RequestAttribute("userId") Long userId) {
+        List<Product> products = productService.getMyProducts(userId);
+        return Result.success(products, "获取发布商品列表成功");
     }
 
     //上传图片（支持单张或多张）

@@ -15,9 +15,9 @@ public class ProductService {
     @Resource
     private ProductRepository productRepository;
 
-    //获取所有商品列表
+    //获取所有商品列表（只返回 buyerStatus 和 sellerStatus 都为 0 的商品）
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findByBuyerStatusAndSellerStatus(0, 0);
     }
 
     //根据商品ID获取商品
@@ -26,15 +26,23 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("商品不存在"));
     }
 
-    //根据分类获取商品
+    //根据分类获取商品（只返回 buyerStatus 和 sellerStatus 都为 0 的商品）
     public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByProductCategory(category);
+        return productRepository.findByProductCategoryAndBuyerStatusAndSellerStatus(category, 0, 0);
     }
 
     //购买商品
-    public Product buyProduct(int productId, Long buyerId) {
-        Product product = productRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("商品不存在"));
+    public ResponseEntity<Result> buyProduct(int productId, Long buyerId) {
+        // 查找商品
+        Product product = productRepository.findByProductId(productId).orElse(null);
+        if (product == null) {
+            return Result.error(404, "商品不存在");
+        }
+
+        // 判断是否购买自己的商品
+        if (product.getSellerId() != null && product.getSellerId().equals(buyerId)) {
+            return Result.error(400, "不可购买自己发布的商品");
+        }
 
         // 将buyerStatus从0改为1
         product.setBuyerStatus(1);
@@ -42,7 +50,8 @@ public class ProductService {
         product.setBuyerId(buyerId);
 
         // 保存更新
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return Result.success(savedProduct, "购买成功");
     }
 
     //卖家接单
@@ -82,6 +91,11 @@ public class ProductService {
     //获取用户购买的商品
     public List<Product> getMyPurchases(Long buyerId) {
         return productRepository.findByBuyerId(buyerId);
+    }
+
+    //获取用户发布的商品
+    public List<Product> getMyProducts(Long sellerId) {
+        return productRepository.findBySellerId(sellerId);
     }
 
     //删除商品（只能删除自己的商品）
