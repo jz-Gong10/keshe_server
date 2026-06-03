@@ -24,4 +24,10 @@ public class UserController {
     public ResponseEntity<Result> updateProfile(@RequestAttribute("userId") Long userId, @ModelAttribute UpdateProfileDTO updateProfileDTO) {
         return updateProfileService.updateProfile(userId, updateProfileDTO);
     }
+
+    // 获取所有用户列表
+    @GetMapping("/list")
+    public ResponseEntity<Result> getAllUsers() {
+        return updateProfileService.getAllUsers();
+    }
 }

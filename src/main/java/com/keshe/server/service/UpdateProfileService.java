@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UpdateProfileService implements UpdateProfileRepository {
 
@@ -57,5 +59,10 @@ public class UpdateProfileService implements UpdateProfileRepository {
         return Result.success(user, "更新个人资料成功");
     }
 
+    // 获取所有用户列表
+    public ResponseEntity<Result> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return Result.success(users, "获取用户列表成功");
+    }
 
 }

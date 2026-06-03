@@ -50,6 +50,7 @@ public class SecurityConfiguration {
                                 authz
                                         .requestMatchers("/auth/**").permitAll()
                                         .requestMatchers("/uploads/**").permitAll() // 允许访问上传的静态文件
+                                        .requestMatchers("/user/list").permitAll() // 用户列表接口不需要认证
                                         .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/user/**").authenticated()
                                         .anyRequest().permitAll();
