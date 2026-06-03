@@ -28,6 +28,9 @@ public class Comment {
     // 评论用户ID
     private Long userId;
     
+    // 用户昵称（持久化到数据库）
+    private String nickname;
+    
     // 评论时间
     private LocalDateTime createTime;
 
