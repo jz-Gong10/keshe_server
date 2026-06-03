@@ -82,12 +82,13 @@ public class ProductController {
     @PostMapping("/upload")
     public ResponseEntity<Result> uploadImage(@RequestParam("files") List<MultipartFile> files) {
         try {
-            List<String> urls = FileUploadUtils.uploadFiles(files);
+            // 存储并返回相对路径
+            List<String> relativeUrls = FileUploadUtils.uploadFilesRelative(files);
             // 如果只上传了一张，返回单个URL，否则返回URL列表
-            if (urls.size() == 1) {
-                return Result.success(urls.getFirst(), "上传成功");
+            if (relativeUrls.size() == 1) {
+                return Result.success(relativeUrls.getFirst(), "上传成功");
             } else {
-                return Result.success(urls, "上传成功");
+                return Result.success(relativeUrls, "上传成功");
             }
         } catch (IOException e) {
             return Result.error(500, "上传失败: " + e.getMessage());

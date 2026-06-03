@@ -82,4 +82,62 @@ public class FileUploadUtils {
             return false;
         }
     }
+
+    // 上传文件（返回相对路径）
+    public static String uploadFileRelative(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String filename = UUID.randomUUID().toString() + extension;
+        Path filePath = Paths.get(uploadDir, filename);
+
+        Files.write(filePath, file.getBytes());
+
+        return "/uploads/" + filename;  // 返回相对路径
+    }
+
+    // 上传多个文件（返回相对路径）
+    public static List<String> uploadFilesRelative(List<MultipartFile> files) throws IOException {
+        List<String> urls = new ArrayList<>();
+        if (files != null) {
+            for (MultipartFile file : files) {
+                String url = uploadFileRelative(file);
+                if (url != null) {
+                    urls.add(url);
+                }
+            }
+        }
+        return urls;
+    }
+
+    // 将相对路径转换为完整URL
+    public static String getFullUrl(String relativePath) {
+        if (relativePath == null || relativePath.isEmpty()) {
+            return null;
+        }
+        return baseUrl + relativePath;
+    }
+
+    // 将相对路径列表转换为完整URL列表
+    public static List<String> getFullUrls(List<String> relativePaths) {
+        List<String> urls = new ArrayList<>();
+        if (relativePaths != null) {
+            for (String path : relativePaths) {
+                urls.add(getFullUrl(path));
+            }
+        }
+        return urls;
+    }
 }
