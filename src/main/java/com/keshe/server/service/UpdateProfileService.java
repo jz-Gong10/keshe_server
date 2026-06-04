@@ -20,18 +20,20 @@ public class UpdateProfileService implements UpdateProfileRepository {
 
     @Override
     public ResponseEntity<Result> getProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("用户不存在"));
-//        // 隐藏密码等敏感信息
-//        user.setPassword(null);
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return Result.error(404, "用户不存在");
+        }
         return Result.success(user, "获取个人资料成功");
     }
 
     @Override
     @Transactional
     public ResponseEntity<Result> updateProfile(Long userId, UpdateProfileDTO updateProfileDTO) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return Result.error(404, "用户不存在");
+        }
 
         // 更新个人资料
         if (updateProfileDTO.getNickname() != null) {

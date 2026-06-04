@@ -70,18 +70,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 jwt = jwt.substring(0, jwt.length() - 1);
             }
             
-            // 使用JWTUtil获取用户ID
-            userId = JWTUtil.getTokenInfo(jwt, JWTUtil.SECRET_KEY).get("user_id", String.class);
+            // 使用JWTUtil获取用户ID（添加空值检查）
+            userId = null;
+            try {
+                var tokenInfo = JWTUtil.getTokenInfo(jwt, JWTUtil.SECRET_KEY);
+                if (tokenInfo != null) {
+                    userId = tokenInfo.get("user_id", String.class);
+                }
+            } catch (Exception e) {
+                // JWT解析失败，继续执行过滤器链
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (userId != null && authentication == null) {
+            // 添加 userId 非空检查
+            if (userId != null && !userId.isEmpty() && authentication == null) {
                 // 根据用户ID获取用户详情
                 UserDetails userDetails = null;
                 try {
                     userDetails = this.userDetailsService.loadUserById(Long.parseLong(userId));
                 } catch (Exception e) {
-                    // 处理异常
+                    // 用户ID格式错误或用户不存在
                 }
 
                 if (userDetails != null) {
@@ -94,7 +105,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     // 设置用户 ID 到请求属性中
-                    request.setAttribute("userId", Long.parseLong(userId));
+                    try {
+                        request.setAttribute("userId", Long.parseLong(userId));
+                    } catch (NumberFormatException e) {
+                        // 用户ID格式错误
+                    }
                 }
             }
             SecurityContext context = SecurityContextHolder.getContext();

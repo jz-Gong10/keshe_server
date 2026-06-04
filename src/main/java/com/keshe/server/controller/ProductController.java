@@ -53,8 +53,7 @@ public class ProductController {
     //卖家接单
     @PostMapping("/accept")
     public ResponseEntity<Result> acceptOrder(@RequestBody AcceptOrderDTO dto, @RequestAttribute("userId") Long userId) {
-        Product product = productService.acceptOrder(dto.getProductId(), userId);
-        return Result.success(product, "接单成功");
+        return productService.acceptOrder(dto.getProductId(), userId);
     }
 
     //发布商品

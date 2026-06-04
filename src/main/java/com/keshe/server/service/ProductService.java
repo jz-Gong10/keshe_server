@@ -55,20 +55,24 @@ public class ProductService {
     }
 
     //卖家接单
-    public Product acceptOrder(int productId, Long sellerId) {
-        Product product = productRepository.findByProductId(productId)
-                .orElseThrow(() -> new RuntimeException("商品不存在"));
+    public ResponseEntity<Result> acceptOrder(int productId, Long sellerId) {
+        // 查找商品
+        Product product = productRepository.findByProductId(productId).orElse(null);
+        if (product == null) {
+            return Result.error(404, "商品不存在");
+        }
 
-        // 验证是否是商品的卖家
-        if (!sellerId.equals(product.getSellerId())) {
-            throw new RuntimeException("只有商品卖家才能接单");
+        // 验证是否是商品的卖家（添加空值检查）
+        if (product.getSellerId() == null || !sellerId.equals(product.getSellerId())) {
+            return Result.error(403, "只有商品卖家才能接单");
         }
 
         // 将sellerStatus从0改为1
         product.setSellerStatus(1);
 
         // 保存更新
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return Result.success(savedProduct, "接单成功");
     }
 
     //发布商品

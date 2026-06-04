@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,18 +22,34 @@ public class FileUploadUtils {
     private static String baseUrl;
 
     @Value("${file.upload.dir:${user.dir}/uploads}")
-    public void setUploadDir(String uploadDir) {
-        FileUploadUtils.uploadDir = uploadDir;
-    }
+    private String uploadDirConfig;
 
     @Value("${file.base-url:http://localhost:8080}")
-    public void setBaseUrl(String baseUrl) {
-        FileUploadUtils.baseUrl = baseUrl;
+    private String baseUrlConfig;
+
+    @PostConstruct
+    public void init() {
+        uploadDir = uploadDirConfig;
+        baseUrl = baseUrlConfig;
+        // 确保上传目录存在
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 
     public static String uploadFile(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             return null;
+        }
+
+        // 确保 uploadDir 不为空
+        if (uploadDir == null) {
+            uploadDir = System.getProperty("user.dir") + "/uploads";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
         }
 
         File dir = new File(uploadDir);
@@ -51,6 +68,10 @@ public class FileUploadUtils {
 
         Files.write(filePath, file.getBytes());
 
+        // 确保 baseUrl 不为空
+        if (baseUrl == null) {
+            baseUrl = "http://localhost:8080";
+        }
         return baseUrl + "/uploads/" + filename;
     }
 
@@ -72,6 +93,11 @@ public class FileUploadUtils {
             return false;
         }
 
+        // 确保 uploadDir 不为空
+        if (uploadDir == null) {
+            uploadDir = System.getProperty("user.dir") + "/uploads";
+        }
+
         String filename = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
         Path filePath = Paths.get(uploadDir, filename);
 
@@ -87,6 +113,15 @@ public class FileUploadUtils {
     public static String uploadFileRelative(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             return null;
+        }
+
+        // 确保 uploadDir 不为空
+        if (uploadDir == null) {
+            uploadDir = System.getProperty("user.dir") + "/uploads";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
         }
 
         File dir = new File(uploadDir);
@@ -126,6 +161,10 @@ public class FileUploadUtils {
     public static String getFullUrl(String relativePath) {
         if (relativePath == null || relativePath.isEmpty()) {
             return null;
+        }
+        // 确保 baseUrl 不为空
+        if (baseUrl == null) {
+            baseUrl = "http://localhost:8080";
         }
         return baseUrl + relativePath;
     }
